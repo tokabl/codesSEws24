@@ -1,12 +1,11 @@
 package org.hbrs.se1.ws24.exercises.uebung3.persistence;
 
 
-
-
 import java.io.*;
 import java.util.List;
 
-public class PersistenceStrategyStream<E> implements PersistenceStrategy<E> {
+public class
+PersistenceStrategyStream<E> implements PersistenceStrategy<E> {
 
     // URL of file, in which the objects are stored
     private String location = "objects.ser";
@@ -28,7 +27,7 @@ public class PersistenceStrategyStream<E> implements PersistenceStrategy<E> {
             fos = new FileOutputStream(location);
             fis = new FileInputStream(location);
         } catch (IOException e) {
-            throw new PersistenceException(PersistenceException.ExceptionType.ConnectionNotAvailable,new Exception("File not found, connection not available"));
+            throw new PersistenceException(PersistenceException.ExceptionType.ConnectionNotAvailable, new Exception("File not found, connection not available"));
         }
         try {
             oos = new ObjectOutputStream(fos);
