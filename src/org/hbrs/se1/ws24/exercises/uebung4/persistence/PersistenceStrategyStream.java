@@ -1,4 +1,4 @@
-package org.hbrs.se1.ws24.exercises.uebung3.persistence;
+package org.hbrs.se1.ws24.exercises.uebung4.persistence;
 
 
 import java.io.*;
@@ -52,17 +52,17 @@ PersistenceStrategyStream<E> implements PersistenceStrategy<E> {
 
     @Override
     /**
-     * Method for saving a list of Member-objects to a disk (HDD)
+     * Method for saving a list of objects to a disk (HDD)
      * Look-up in Google for further help! Good source:
      * https://www.digitalocean.com/community/tutorials/objectoutputstream-java-write-object-file
      * (Last Access: Oct, 15th 2024)
      */
-    public void save(List<E> member ) throws PersistenceException {
+    public void save(List<E> userStoryList) throws PersistenceException {
         try {
             openConnection();
-            for (E m : member) {
-                oos.writeObject(m);
-            }
+
+            // Speichern der gesamten Liste
+            oos.writeObject(userStoryList);
         } catch (IOException e) {
             throw new PersistenceException(PersistenceException.ExceptionType.SaveFailure, new Exception("Error while saving the file"));
         } finally {
@@ -73,39 +73,41 @@ PersistenceStrategyStream<E> implements PersistenceStrategy<E> {
 
     @Override
     /**
-     * Method for loading a list of Member-objects from a disk (HDD)
+     * Method for loading a list of objects from a disk (HDD)
      * Some coding examples come for free :-)
      * Take also a look at the import statements above ;-!
      */
     public List<E> load() throws PersistenceException {
         List<E> liste = null;
 
+        // Überprüfen, ob die Datei existiert
+        File file = new File(location);
+        if (!file.exists()) {
+            throw new PersistenceException(PersistenceException.ExceptionType.LoadFailure, new Exception("File does not exist"));
+        }
+
         try {
             fis = new FileInputStream(location);
             ois = new ObjectInputStream(fis);
 
-            // Lesen der Liste
+            // Lesen der Liste von UserStory-Objekten
             Object obj = ois.readObject();
 
-
-            // Überprüfen, ob das Objekt eine Liste ist
+            // Überprüfen, ob das geladene Objekt eine Liste ist
             if (obj instanceof List<?>) {
                 liste = (List<E>) obj;
+                System.out.println("Daten wurden erfolgreich geladen: " + liste.size() + " Elemente.");
             } else {
-                throw new PersistenceException(PersistenceException.ExceptionType.LoadFailure, new Exception("File dose not contain a list"));
+                throw new PersistenceException(PersistenceException.ExceptionType.LoadFailure, new Exception("File does not contain a list"));
             }
-
-        } catch (IOException e) {
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace(); // Hier die Fehlermeldung ausgeben, um genau zu sehen, was schiefgeht
             throw new PersistenceException(PersistenceException.ExceptionType.LoadFailure, new Exception("Error while loading the file"));
-        } catch (ClassNotFoundException e) {
-            throw new PersistenceException(PersistenceException.ExceptionType.LoadFailure, new Exception("Error while loading the file, class not found"));
         } finally {
             closeConnection();
         }
 
         return liste;
-
-
     }
 
 }
